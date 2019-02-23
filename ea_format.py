@@ -1,3 +1,4 @@
+import logging
 from openpyxl import load_workbook
 import attr
 from dateutil.parser import parse
@@ -8,6 +9,7 @@ from cpd_rules import CPD_TYPES, CPD_MINS
 
 env = Environment(loader=FileSystemLoader('templates'))
 template = env.get_template('cpd_summary.html')
+
 
 def parse_date(date_str):
     """ Parse a date string """
@@ -68,15 +70,16 @@ class Record(object):
     learning_outcome = attr.ib()
 
     @property
-    def fin_yr(self):
-        """ Return FY of CPD """
-        fy = (self.start_date - relativedelta(months=6))
-        return fy.year
+    def yr_grp(self):
+        """ Return year grouping of CPD """
+        if self.start_date.month <= 6:
+            return f'{self.start_date.year}-H1'
+        return f'{self.start_date.year}-H2'
 
     def cpd_current(self, years=3):
         """ Return whether record is in last 3 years """
         diff = datetime.now() - self.start_date
-        if diff.days < 365.25*years:
+        if diff.days < 365.25 * years:
             return True
         return False
 
@@ -87,9 +90,9 @@ def read_workbook(filename: str):
     sheet = wb['CPD Records']
 
     data = []
-    for i in range(1, sheet.max_row+1):
+    for i in range(1, sheet.max_row + 1):
         row = []
-        for j in range(1, sheet.max_column+1):
+        for j in range(1, sheet.max_column + 1):
             cell = sheet.cell(row=i, column=j).value
             row.append(cell)
         data.append(row)
@@ -150,8 +153,7 @@ def get_cpd_totals(records, years=3):
     for cpd_type in cpd_group:
         records = cpd_group[cpd_type]
         risk_hrs, bus_hrs, area_hrs, other_hrs = sum_cpd_hours(records)
-        t = CPDTotal(cpd_type, risk_hrs,
-                     bus_hrs, area_hrs, other_hrs)
+        t = CPDTotal(cpd_type, risk_hrs, bus_hrs, area_hrs, other_hrs)
         totals.append(t)
     return totals
 
@@ -185,16 +187,17 @@ def build_summary_table(records, years=3):
     return summary
 
 
-def yearly_hours(records):
-    """ Get hours by financial year """
-    fy_data = dict()
+def yearly_hours(records, years=4):
+    """ Get hours by year grouping """
+    group_data = dict()
     for record in records:
-        fy = record.fin_yr
-        if fy not in fy_data.keys():
-            fy_data[fy] = 0
-        total_hrs = record.total_hrs
-        fy_data[fy] += total_hrs
-    return fy_data
+        if record.cpd_current(years):
+            yr_grp = record.yr_grp
+            if yr_grp not in group_data.keys():
+                group_data[yr_grp] = 0
+            total_hrs = record.total_hrs
+            group_data[yr_grp] += total_hrs
+    return group_data
 
 
 def build_report(cpd_data={}):
@@ -206,14 +209,22 @@ def build_report(cpd_data={}):
 
 
 if __name__ == '__main__':
-    records = parse_ea_records(filename='example.xlsx')
+
+    LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+    logger = logging.getLogger()  # Root Logger
+    logging.basicConfig(level='INFO', format=LOG_FORMAT)
+
+    records = parse_ea_records(filename='record_20190223.xlsx')
+    logging.info('Records passed')
     summary_tbl = build_summary_table(records)
     summary_tbl2 = build_summary_table(records, years=2)
-    fy_data = yearly_hours(records)
+    yr_data = yearly_hours(records)
 
-    cpd_data = {'summary_tbl': summary_tbl,
-                'summary_tbl2': summary_tbl2,
-                'mins': CPD_MINS,
-                'fy_hrs': fy_data,
-                }
+    cpd_data = {
+        'summary_tbl': summary_tbl,
+        'summary_tbl2': summary_tbl2,
+        'mins': CPD_MINS,
+        'yr_data': yr_data,
+        'records': records,
+    }
     build_report(cpd_data)
