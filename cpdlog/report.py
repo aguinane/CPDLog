@@ -5,15 +5,13 @@ from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
-from cpd_rules import CPD_TYPES, CPD_MINS
+from sqlalchemy import create_engine
 
+from .cpd_rules import CPD_TYPES, CPD_MINS
+
+log = logging.getLogger(__name__)
 env = Environment(loader=FileSystemLoader('templates'))
 template = env.get_template('cpd_summary.html')
-
-
-def parse_date(date_str):
-    """ Parse a date string """
-    return parse(date_str, dayfirst=True)
 
 
 @attr.s
@@ -51,93 +49,24 @@ class CPDTotal(object):
         return CPD_TYPES[self.cpd_type]['limit']
 
 
-@attr.s
-class Record(object):
-    ref_no = attr.ib()
-    cpd_type = attr.ib()
-    start_date = attr.ib(converter=parse_date)
-    end_date = attr.ib(converter=parse_date)
-    activity = attr.ib()
-    topic = attr.ib()
-    provider = attr.ib()
-    division = attr.ib()
-    location = attr.ib()
-    total_hrs = attr.ib()
-    risk_hrs = attr.ib()
-    bus_hrs = attr.ib()
-    area_hrs = attr.ib()
-    notes = attr.ib()
-    learning_outcome = attr.ib()
-
-    @property
-    def yr_grp(self):
-        """ Return year grouping of CPD """
-        if self.start_date.month <= 6:
-            return f'{self.start_date.year}-H1'
-        return f'{self.start_date.year}-H2'
-
-    def cpd_current(self, years=3):
-        """ Return whether record is in last 3 years """
-        diff = datetime.now() - self.start_date
-        if diff.days < 365.25 * years:
-            return True
-        return False
-
-
-def read_workbook(filename: str):
-
-    wb = load_workbook(filename)
-    sheet = wb['CPD Records']
-
-    data = []
-    for i in range(1, sheet.max_row + 1):
-        row = []
-        for j in range(1, sheet.max_column + 1):
-            cell = sheet.cell(row=i, column=j).value
-            row.append(cell)
-        data.append(row)
-
-    return data
-
-
-def parse_ea_records(filename):
-
-    data = read_workbook(filename)
-    data.pop(0)  # Remove first row
-    data.pop(0)  # Remove headings row
-
-    new_rows = list()
-    for row in data[0::2]:
-        new_rows.append(row)
-
-    for i, row in enumerate(data[1::2]):
-        cell = row[3]
-        new_rows[i].append(cell)
-
-    records = list()
-    for row in new_rows:
-        records.append(Record(*row))
-    return records
-
-
-def group_records_by_cpd_type(records, years=3):
-    """ Group CPD records by CPD Type """
+def group_activities_by_cpd_type(activities, years=3):
+    """ Group CPD activities by CPD Type """
     type_group = dict()
     for cpd_type in CPD_TYPES.keys():
         type_group[cpd_type] = list()
-    for record in records:
-        cpd_type = record.cpd_type.replace('Type ', '')
-        if record.cpd_current(years):
+    for record in activities:
+        cpd_type = record.cpd_category
+        if not record.cpd_expired(years):
             type_group[cpd_type].append(record)
     return type_group
 
 
-def sum_cpd_hours(records):
+def sum_cpd_hours(activities):
     risk_hrs = 0
     bus_hrs = 0
     area_hrs = 0
     total_hrs = 0
-    for record in records:
+    for record in activities:
         risk_hrs += record.risk_hrs
         bus_hrs += record.bus_hrs
         area_hrs += record.area_hrs
@@ -146,22 +75,22 @@ def sum_cpd_hours(records):
     return risk_hrs, bus_hrs, area_hrs, other_hrs
 
 
-def get_cpd_totals(records, years=3):
+def get_cpd_totals(activities, years=3):
     """ Group CPD by FY and CPD Type """
     totals = list()
-    cpd_group = group_records_by_cpd_type(records, years)
+    cpd_group = group_activities_by_cpd_type(activities, years)
     for cpd_type in cpd_group:
-        records = cpd_group[cpd_type]
-        risk_hrs, bus_hrs, area_hrs, other_hrs = sum_cpd_hours(records)
+        activities = cpd_group[cpd_type]
+        risk_hrs, bus_hrs, area_hrs, other_hrs = sum_cpd_hours(activities)
         t = CPDTotal(cpd_type, risk_hrs, bus_hrs, area_hrs, other_hrs)
         totals.append(t)
     return totals
 
 
-def build_summary_table(records, years=3):
+def build_summary_table(activities, years=3):
     """ Build a CPD summary table """
     summary = dict()
-    totals = get_cpd_totals(records, years)
+    totals = get_cpd_totals(activities, years)
     for row in totals:
         summary[row.cpd_type] = {
             'desc': row.cpd_desc,
@@ -187,11 +116,11 @@ def build_summary_table(records, years=3):
     return summary
 
 
-def yearly_hours(records, years=4):
+def yearly_hours(activities, years=4):
     """ Get hours by year grouping """
     group_data = dict()
-    for record in records:
-        if record.cpd_current(years):
+    for record in activities:
+        if not record.cpd_expired(years):
             yr_grp = record.yr_grp
             if yr_grp not in group_data.keys():
                 group_data[yr_grp] = 0
@@ -200,31 +129,23 @@ def yearly_hours(records, years=4):
     return group_data
 
 
-def build_report(cpd_data={}):
+def build_report(activities, cpd_data, output_loc="cpd_report.html"):
     """ Build HTML report """
-    output_html = template.render(**cpd_data)
-    with open("build/output.html", "w", encoding='utf-8') as fh:
+    output_html = template.render(activities=activities, **cpd_data)
+    with open(output_loc, "w", encoding='utf-8') as fh:
         fh.write(output_html)
-    print('Saved file')
+    log.info('Created %s', output_loc)
 
 
-if __name__ == '__main__':
-
-    LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
-    logger = logging.getLogger()  # Root Logger
-    logging.basicConfig(level='INFO', format=LOG_FORMAT)
-
-    records = parse_ea_records(filename='record_20190223.xlsx')
-    logging.info('Records passed')
-    summary_tbl = build_summary_table(records)
-    summary_tbl2 = build_summary_table(records, years=2)
-    yr_data = yearly_hours(records)
-
+def combine_report_data(activities):
+    """ Build CPD summaries """
+    summary_tbl = build_summary_table(activities)
+    summary_tbl2 = build_summary_table(activities, years=2)
+    yr_data = yearly_hours(activities)
     cpd_data = {
         'summary_tbl': summary_tbl,
         'summary_tbl2': summary_tbl2,
         'mins': CPD_MINS,
         'yr_data': yr_data,
-        'records': records,
     }
-    build_report(cpd_data)
+    return cpd_data

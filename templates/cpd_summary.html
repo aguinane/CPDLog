@@ -52,29 +52,29 @@
                     <td>{{ val.bus_hrs }}</td>
                     <td>{{ val.area_hrs }}</td>
                     <td>{{ val.other_hrs }}</td>
-                    <td{% if val.total_hrs == val.limit %} class="table-warning" {% endif %}>
+                    <td {% if val.total_hrs == val.limit %}class="table-warning" {% endif %}>
                         {{ val.total_hrs }}
-                        </td>
-                        <td>
-                            {% if val.conditions %}
-                            <abbr title="{{ val.conditions }}">ℹ️</abbr>
-                            {% endif %}
-                        </td>
-                        {% else %}
-                        <!-- Total Row -->
-                        <th>Total</td>
-                            <td{% if val.risk_hrs <= mins.risk %} class="table-danger" {% endif %}>
-                                {{ val.risk_hrs }}</td>
-                                <td{% if val.bus_hrs <= mins.bus %} class="table-danger" {% endif %}>
-                                    {{ val.bus_hrs }}</td>
-                                    <td{% if val.area_hrs <= mins.area %} class="table-danger" {% endif %}>
-                                        {{ val.area_hrs }}</td>
-                        <td>{{ val.other_hrs }}</td>
-                        <td{% if val.total_hrs <= mins.total %} class="table-danger" {% endif %}>
-                            {{ val.total_hrs }}
-                            </td>
+                    </td>
+                    <td>
+                        {% if val.conditions %}
+                        <abbr title="{{ val.conditions }}">ℹ️</abbr>
+                        {% endif %}
+                    </td>
+                    {% else %}
+                    <!-- Total Row -->
+                    <th>Total</th>
+                    <td {% if val.risk_hrs <= mins.risk %}class="table-danger" {% endif %}>
+                        {{ val.risk_hrs }}</td>
+                    <td {% if val.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
+                        {{ val.bus_hrs }}</td>
+                    <td {% if val.area_hrs <= mins.area %}class="table-danger" {% endif %}>
+                        {{ val.area_hrs }}</td>
+                    <td>{{ val.other_hrs }}</td>
+                    <td {% if val.total_hrs <= mins.total %}class="table-danger" {% endif %}>
+                        {{ val.total_hrs }}
+                    </td>
 
-                            {% endif %}
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -118,23 +118,21 @@
                     {% if loop.last %}
                     <!-- Total Row -->
                     <th>Total</td>
-                        <td{% if val.risk_hrs <= mins.risk %} class="table-danger" {% endif %}>
-                            {{ val.risk_hrs }}</td>
-                            <td{% if val.bus_hrs <= mins.bus %} class="table-danger" {% endif %}>
-                                {{ val.bus_hrs }}</td>
-                                <td{% if val.area_hrs <= mins.area %} class="table-danger" {% endif %}>
-                                    {{ val.area_hrs }}</td>
+                    <td {% if val.risk_hrs <= mins.risk %}class="table-danger" {% endif %}>
+                        {{ val.risk_hrs }}</td>
+                    <td {% if val.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
+                        {{ val.bus_hrs }}</td>
+                    <td {% if val.area_hrs <= mins.area %}class="table-danger" {% endif %}>
+                        {{ val.area_hrs }}</td>
                     <td>{{ val.other_hrs }}</td>
-                    <td{% if val.total_hrs <= mins.total %} class="table-danger" {% endif %}>
+                    <td {% if val.total_hrs <= mins.total %}class="table-danger" {% endif %}>
                         {{ val.total_hrs }}
-                        </td>
-                        {% endif %}
+                    </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-
-
 
 
         <div class="input-group">
@@ -146,7 +144,7 @@
 
 
         <table class="table table-sm table-striped">
-            <caption>CPD Records</caption>
+            <caption>CPD activities</caption>
             <thead>
                 <tr>
                     <th>Date</th>
@@ -157,10 +155,10 @@
                 </tr>
             </thead>
             <tbody class="searchable">
-                {% for record in records %}
-                {% if record.cpd_current(3) %}
+                {% for record in activities %}
+                {% if not record.cpd_expired(3) %}
                 <tr>
-                    <td>{{record.start_date.date()}}</td>
+                    <td>{{record.start_date}}</td>
                     <td>{{record.cpd_type}}</td>
                     <td>{{record.topic}}</td>
                     <td>{{record.provider}}</td>
@@ -172,7 +170,7 @@
         </table>
 
         <table class="table table-sm table-striped">
-            <caption>Old CPD Records</caption>
+            <caption>Expired CPD activities</caption>
             <thead>
                 <tr>
                     <th>Date</th>
@@ -183,10 +181,10 @@
                 </tr>
             </thead>
             <tbody class="searchable">
-                {% for record in records %}
-                {% if not record.cpd_current(3) %}
+                {% for record in activities %}
+                {% if record.cpd_expired(3) %}
                 <tr>
-                    <td>{{record.start_date.date()}}</td>
+                    <td>{{record.start_date}}</td>
                     <td>{{record.cpd_type}}</td>
                     <td>{{record.topic}}</td>
                     <td>{{record.provider}}</td>
@@ -199,86 +197,88 @@
 
 
     </div><!-- /container -->
-</body>
 
 
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script>
-    var x = [];
-    var y = [];
-    {% for key, val in yr_data | dictsort %}
-    x.push("{{ key }}");
-    y.push({{ val }});
-    {% endfor %}
 
-    var trace = {
-        x: x,
-        y: y,
-        name: 'CPD Hours',
-        type: 'bar'
-    };
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        var x = [];
+        var y = [];
+        {% for key, val in yr_data | dictsort %}
+        x.push("{{ key }}");
+        y.push({{ val }});
+        {% endfor %}
 
-    var data = [trace];
-    var layout = {
-        title: {
-            text: 'Total Half-Yearly CPD Hours',
-        },
-        showlegend: false,
-        shapes: [
-            // Horizontal lines
-            {
-                type: 'line',
-                xref: 'paper',
-                x0: 0,
-                x1: 1,
-                yref: 'y',
-                y0: 25,
-                y1: 25,
-                line: {
-                    dash: 'dot',
-                    color: "#000000"
+        var trace = {
+            x: x,
+            y: y,
+            name: 'CPD Hours',
+            type: 'bar'
+        };
+
+        var data = [trace];
+        var layout = {
+            title: {
+                text: 'Total Half-Yearly CPD Hours',
+            },
+            showlegend: false,
+            shapes: [
+                // Horizontal lines
+                {
+                    type: 'line',
+                    xref: 'paper',
+                    x0: 0,
+                    x1: 1,
+                    yref: 'y',
+                    y0: 25,
+                    y1: 25,
+                    line: {
+                        dash: 'dot',
+                        color: "#000000"
+                    }
                 }
+            ]
+        };
+        var graphDiv = document.getElementById('fy_hrs_chart');
+        Plotly.newPlot(graphDiv, data, layout);
+    </script>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+
+
+    <script>
+
+        $(document).ready(function () {
+            (function ($) {
+                $('#filter').keyup(function () {
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('.searchable tr').hide();
+                    $('.searchable tr').filter(function () {
+                        return rex.test($(this).text());
+                    }).show();
+                })
+            }(jQuery));
+        });
+
+        var focusedFlag = false;
+        $('body').on('keydown', function () {
+            var input = $('#filter');
+            if (!input.is(':focus') && focusedFlag == false) {
+                input.focus();
+                focusedFlag = true;
             }
-        ]
-    };
-    var graphDiv = document.getElementById('fy_hrs_chart');
-    Plotly.newPlot(graphDiv, data, layout);
-</script>
+        });
+    </script>
 
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
-    integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
-    crossorigin="anonymous"></script>
-
-
-<script>
-
-    $(document).ready(function () {
-        (function ($) {
-            $('#filter').keyup(function () {
-                var rex = new RegExp($(this).val(), 'i');
-                $('.searchable tr').hide();
-                $('.searchable tr').filter(function () {
-                    return rex.test($(this).text());
-                }).show();
-            })
-        }(jQuery));
-    });
-
-    var focusedFlag = false;
-    $('body').on('keydown', function () {
-        var input = $('#filter');
-        if (!input.is(':focus') && focusedFlag == false) {
-            input.focus();
-            focusedFlag = true;
-        }
-    });
-</script>
+</body>
 
 </html>
