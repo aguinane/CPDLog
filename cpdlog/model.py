@@ -1,6 +1,7 @@
 from datetime import date
 from sqlalchemy import create_engine
-from sqlalchemy import Column, String, Date, Float, Integer
+from sqlalchemy import Column, String, Date, Float, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -22,6 +23,9 @@ class Activities(Base):
     duration = Column(Float)
     notes = Column(String)
     ext_ref = Column(String)
+    subjectareas = relationship(
+        "SubjectArea", lazy=True, cascade="all, delete, delete-orphan"
+    )
 
     def __repr__(self):
         return "<Activity {} {} {}>".format(
@@ -30,15 +34,24 @@ class Activities(Base):
 
     @property
     def risk_hrs(self):
-        return 0.0
+        try:
+            return self.subjectareas[0].risk_hrs
+        except IndexError:
+            return 0.0
 
     @property
     def bus_hrs(self):
-        return 0.0
+        try:
+            return self.subjectareas[0].business_hrs
+        except IndexError:
+            return 0.0
 
     @property
     def area_hrs(self):
-        return 0.0
+        try:
+            return self.subjectareas[0].practice_hrs
+        except IndexError:
+            return 0.0
 
     @property
     def total_hrs(self):
@@ -59,6 +72,14 @@ class Activities(Base):
         return True
 
 
+class SubjectArea(Base):
+    __tablename__ = "area"
+    act_id = Column(Integer, ForeignKey("activities.act_id"), primary_key=True)
+    practice_hrs = Column(Float)
+    risk_hrs = Column(Float)
+    business_hrs = Column(Float)
+
+
 def get_cpd_activities(db_url):
     """ Get all CPD activities from database """
     engine = create_engine(db_url)
@@ -71,4 +92,3 @@ def get_cpd_activities(db_url):
 def create_db(db_url):
     engine = create_engine(db_url)
     Base.metadata.create_all(bind=engine)
-

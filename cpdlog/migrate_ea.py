@@ -4,26 +4,26 @@ from openpyxl import load_workbook
 from dateutil.parser import parse
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .model import Activities
+from .model import Activities, SubjectArea
 
 EA_CATEGORIES = {
-    'Type I': 'A',
-    'Type II': 'B',
-    'Type III': 'C',
-    'Type IV': 'D',
-    'Type V': 'E',
-    'Type VI': 'F',
-    'Type VII': 'G',
-    'Type VIII': 'H',
+    "Type I": "A",
+    "Type II": "B",
+    "Type III": "C",
+    "Type IV": "D",
+    "Type V": "E",
+    "Type VI": "F",
+    "Type VII": "G",
+    "Type VIII": "H",
 }
 
 log = logging.getLogger(__name__)
 
 
-def parse_ea_export(filename) -> List['ActivityEA']:
+def parse_ea_export(filename) -> List["ActivityEA"]:
     """ Parse EA CPD Export XLSX file """
     wb = load_workbook(filename)
-    sheet = wb['CPD Records']
+    sheet = wb["CPD Records"]
 
     data = []
     for i in range(1, sheet.max_row + 1):
@@ -85,7 +85,7 @@ def import_ea_cpd_activities(db_url: str, filename):
 
         r = session.query(Activities).filter(Activities.ext_ref == a.ext_ref).first()
         if r:
-            log.info('Skipped existing entry %s', a.ext_ref)
+            log.info("Skipped existing entry %s", a.ext_ref)
             continue
 
         notes = a.learning_outcome
@@ -105,5 +105,14 @@ def import_ea_cpd_activities(db_url: str, filename):
             ext_ref=a.ext_ref,
         )
         session.add(activity)
-    session.commit()
+        session.commit()
+        act_id = activity.act_id
+        area = SubjectArea(
+            act_id=act_id,
+            practice_hrs=a.area_hrs,
+            risk_hrs=a.risk_hrs,
+            business_hrs=a.bus_hrs,
+        )
+        session.add(area)
 
+    session.commit()

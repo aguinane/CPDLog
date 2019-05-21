@@ -10,8 +10,8 @@ from sqlalchemy import create_engine
 from .cpd_rules import CPD_TYPES, CPD_MINS
 
 log = logging.getLogger(__name__)
-env = Environment(loader=FileSystemLoader('templates'))
-template = env.get_template('cpd_summary.html')
+env = Environment(loader=FileSystemLoader("templates"))
+template = env.get_template("cpd_summary.html")
 
 
 @attr.s
@@ -34,19 +34,19 @@ class CPDTotal(object):
 
     @property
     def cpd_desc(self):
-        return CPD_TYPES[self.cpd_type]['desc']
+        return CPD_TYPES[self.cpd_type]["desc"]
 
     @property
     def cpd_long_desc(self):
-        return CPD_TYPES[self.cpd_type]['desc_long']
+        return CPD_TYPES[self.cpd_type]["desc_long"]
 
     @property
     def conditions(self):
-        return CPD_TYPES[self.cpd_type]['conditions']
+        return CPD_TYPES[self.cpd_type]["conditions"]
 
     @property
     def cpd_limit(self):
-        return CPD_TYPES[self.cpd_type]['limit']
+        return CPD_TYPES[self.cpd_type]["limit"]
 
 
 def group_activities_by_cpd_type(activities, years=3):
@@ -89,31 +89,31 @@ def get_cpd_totals(activities, years=3):
 
 def build_summary_table(activities, years=3):
     """ Build a CPD summary table """
-    summary = dict()
+    type_summary = dict()
     totals = get_cpd_totals(activities, years)
     for row in totals:
-        summary[row.cpd_type] = {
-            'desc': row.cpd_desc,
-            'long_desc': row.cpd_long_desc,
-            'risk_hrs': row.risk_hrs,
-            'bus_hrs': row.bus_hrs,
-            'area_hrs': row.area_hrs,
-            'other_hrs': row.other_hrs,
-            'total_hrs': row.total_hrs,
-            'limit': row.cpd_limit,
-            'conditions': row.conditions,
+        type_summary[row.cpd_type] = {
+            "desc": row.cpd_desc,
+            "long_desc": row.cpd_long_desc,
+            "risk_hrs": row.risk_hrs,
+            "bus_hrs": row.bus_hrs,
+            "area_hrs": row.area_hrs,
+            "other_hrs": row.other_hrs,
+            "total_hrs": row.total_hrs,
+            "limit": row.cpd_limit,
+            "conditions": row.conditions,
         }
-    summary['total'] = {
-        'desc': 'Total',
-        'risk_hrs': sum(row.risk_hrs for row in totals),
-        'bus_hrs': sum(row.bus_hrs for row in totals),
-        'area_hrs': sum(row.area_hrs for row in totals),
-        'other_hrs': sum(row.other_hrs for row in totals),
-        'total_hrs': sum(row.total_hrs for row in totals),
-        'limit': 150,
-        'conditions': CPD_MINS['conditions'],
+    area_summary = {
+        "desc": "Total",
+        "risk_hrs": sum(row.risk_hrs for row in totals),
+        "bus_hrs": sum(row.bus_hrs for row in totals),
+        "area_hrs": sum(row.area_hrs for row in totals),
+        "other_hrs": sum(row.other_hrs for row in totals),
+        "total_hrs": sum(row.total_hrs for row in totals),
+        "limit": 150,
+        "conditions": CPD_MINS["conditions"],
     }
-    return summary
+    return type_summary, area_summary
 
 
 def yearly_hours(activities, years=4):
@@ -132,20 +132,22 @@ def yearly_hours(activities, years=4):
 def build_report(activities, cpd_data, output_loc="cpd_report.html"):
     """ Build HTML report """
     output_html = template.render(activities=activities, **cpd_data)
-    with open(output_loc, "w", encoding='utf-8') as fh:
+    with open(output_loc, "w", encoding="utf-8") as fh:
         fh.write(output_html)
-    log.info('Created %s', output_loc)
+    log.info("Created %s", output_loc)
 
 
 def combine_report_data(activities):
     """ Build CPD summaries """
-    summary_tbl = build_summary_table(activities)
-    summary_tbl2 = build_summary_table(activities, years=2)
+    type_summary, area_summary = build_summary_table(activities)
+    type_summary2, area_summary2 = build_summary_table(activities, years=2)
     yr_data = yearly_hours(activities)
     cpd_data = {
-        'summary_tbl': summary_tbl,
-        'summary_tbl2': summary_tbl2,
-        'mins': CPD_MINS,
-        'yr_data': yr_data,
+        "type_summary": type_summary,
+        "area_summary": area_summary,
+        "type_summary2": type_summary2,
+        "area_summary2": area_summary2,
+        "mins": CPD_MINS,
+        "yr_data": yr_data,
     }
     return cpd_data
