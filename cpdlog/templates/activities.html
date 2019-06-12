@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+{% set active_page = active_page|default('homepage') -%}
+{% block title %}CPD Log{% endblock %}
+{% block container %}
+
+
+<h1 class="display-5">CPD Activities</h1>
+
+
+<div class="input-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text">🔎</span>
+    </div>
+    <input id="filter" type="text" class="form-control" placeholder="Search here...">
+</div>
+
+
+<table class="table table-sm table-striped">
+    <caption>CPD activities</caption>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Topic</th>
+            <th>Provider</th>
+            <th>Hours</th>
+        </tr>
+    </thead>
+    <tbody class="searchable">
+        {% for record in activities %}
+        {% if not record.cpd_expired(3) %}
+        <tr>
+            <td>{{record.start_date}}</td>
+            <td>{{record.cpd_type}}</td>
+            <td>{{record.topic}}</td>
+            <td>{{record.provider}}</td>
+            <td>{{record.total_hrs}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<table class="table table-sm table-striped">
+    <caption>Expired CPD activities</caption>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Topic</th>
+            <th>Provider</th>
+            <th>Hours</th>
+        </tr>
+    </thead>
+    <tbody class="searchable">
+        {% for record in activities %}
+        {% if record.cpd_expired(3) %}
+        <tr>
+            <td>{{record.start_date}}</td>
+            <td>{{record.cpd_type}}</td>
+            <td>{{record.topic}}</td>
+            <td>{{record.provider}}</td>
+            <td>{{record.total_hrs}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock container%}
+{% block footer %}
+
+<script>
+
+    $(document).ready(function () {
+        (function ($) {
+            $('#filter').keyup(function () {
+                var rex = new RegExp($(this).val(), 'i');
+                $('.searchable tr').hide();
+                $('.searchable tr').filter(function () {
+                    return rex.test($(this).text());
+                }).show();
+            })
+        }(jQuery));
+    });
+
+    var focusedFlag = false;
+    $('body').on('keydown', function () {
+        var input = $('#filter');
+        if (!input.is(':focus') && focusedFlag == false) {
+            input.focus();
+            focusedFlag = true;
+        }
+    });
+</script>
+
+{% endblock footer %}

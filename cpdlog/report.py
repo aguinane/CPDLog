@@ -10,8 +10,6 @@ from sqlalchemy import create_engine
 from .cpd_rules import CPD_TYPES, CPD_MINS
 
 log = logging.getLogger(__name__)
-env = Environment(loader=FileSystemLoader("templates"))
-template = env.get_template("cpd_summary.html")
 
 
 @attr.s
@@ -127,14 +125,6 @@ def yearly_hours(activities, years=4):
             total_hrs = record.total_hrs
             group_data[yr_grp] += total_hrs
     return group_data
-
-
-def build_report(activities, cpd_data, output_loc="cpd_report.html"):
-    """ Build HTML report """
-    output_html = template.render(activities=activities, **cpd_data)
-    with open(output_loc, "w", encoding="utf-8") as fh:
-        fh.write(output_html)
-    log.info("Created %s", output_loc)
 
 
 def combine_report_data(activities):

@@ -1,3 +1,5 @@
 openpyxl
 jinja2
-dateutil
+python-dateutil
+flask
+flask_wtf

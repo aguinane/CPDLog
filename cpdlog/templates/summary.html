@@ -1,0 +1,178 @@
+{% extends "layout.html" %}
+{% set active_page = active_page|default('homepage') -%}
+{% block title %}CPD Log{% endblock %}
+{% block container %}
+
+
+
+<h1 class="display-5">CPD Summary</h1>
+
+<div id="fy_hrs_chart" style="max-width: 100%; height: 300px;"></div>
+
+<div class="progress">
+    {% set progress = ((area_summary.total_hrs / mins.total) *100 )|round|int %}
+    <div class="progress-bar progress-bar-striped bg-{% if progress < 100 %}danger{% else %}success{% endif %}"
+        role="progressbar" style="width: {{progress}}%" aria-valuenow="{{progress}}" aria-valuemin="0"
+        aria-valuemax="100">
+        {{ progress }}%
+    </div>
+</div>
+
+<table class="table table-sm table-striped">
+    <caption>3 Yr CPD Hours Summary</caption>
+    <thead>
+        <tr>
+            <th>CPD Type</th>
+            <th>Risk</th>
+            <th>Business</th>
+            <th>Area</th>
+            <th>Other</th>
+            <th>Total</th>
+            <th>Conditions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key, val in type_summary.items() %}
+        <tr>
+            <th>Type <abbr title="{{ val.long_desc }}">{{ key }}</abbr> -
+                {{ val.desc }}
+            </th>
+            <td>{{ val.risk_hrs }}</td>
+            <td>{{ val.bus_hrs }}</td>
+            <td>{{ val.area_hrs }}</td>
+            <td>{{ val.other_hrs }}</td>
+            <td {% if val.total_hrs == val.limit %}class="table-warning" {% endif %}>
+                {{ val.total_hrs }}
+            </td>
+            <td>
+                {% if val.conditions %}
+                <abbr title="{{ val.conditions }}">ℹ️</abbr>
+                {% endif %}
+            </td>
+
+
+        </tr>
+        {% endfor %}
+
+        <tr>
+            <!-- Total Row -->
+            <th>Total</th>
+            <td {% if area_summary.risk_hrs <= mins.risk %}class="table-danger" {% endif %}>
+                {{ area_summary.risk_hrs }}</td>
+            <td {% if area_summary.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
+                {{ area_summary.bus_hrs }}</td>
+            <td {% if area_summary.area_hrs <= mins.area %}class="table-danger" {% endif %}>
+                {{ area_summary.area_hrs }}</td>
+            <td>{{ area_summary.other_hrs }}</td>
+            <td {% if area_summary.total_hrs <= mins.total %}class="table-danger" {% endif %}>
+                {{ area_summary.total_hrs }}
+            </td>
+        </tr>
+
+
+    </tbody>
+</table>
+
+<h2>Forecast CPD</h2>
+
+<div class="progress">
+    {% set progress = ((area_summary2.total_hrs / mins.total) *100 )|round|int %}
+    <div class="progress-bar progress-bar-striped bg-{% if progress < 100 %}danger{% else %}success{% endif %}"
+        role="progressbar" style="width: {{progress}}%" aria-valuenow="{{progress}}" aria-valuemin="0"
+        aria-valuemax="100">
+        {{ progress }}%
+    </div>
+</div>
+
+<p><small>
+        Only CPD from the last 2 years are counted in the totals.
+        This will highlight how much CPD you need to obtain in the coming 12 months.
+    </small>
+</p>
+
+
+<table class="table table-sm table-striped">
+    <caption>2 Yr Summary</caption>
+    <thead>
+        <tr>
+            <th>CPD Type</th>
+            <th>Risk</th>
+            <th>Business</th>
+            <th>Area</th>
+            <th>Other</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <tr>
+
+            <!-- Total Row -->
+            <th>Total</td>
+            <td {% if area_summary2.risk_hrs <= mins.risk %}class="table-danger" {% endif %}>
+                {{ area_summary2.risk_hrs }}</td>
+            <td {% if area_summary2.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
+                {{ area_summary2.bus_hrs }}</td>
+            <td {% if area_summary2.area_hrs <= mins.area %}class="table-danger" {% endif %}>
+                {{ area_summary2.area_hrs }}</td>
+            <td>{{ area_summary2.other_hrs }}</td>
+            <td {% if area_summary2.total_hrs <= mins.total %}class="table-danger" {% endif %}>
+                {{ area_summary2.total_hrs }}
+            </td>
+
+        </tr>
+
+    </tbody>
+</table>
+
+
+
+{% endblock container%}
+{% block footer %}
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    var x = [];
+    var y = [];
+    {% for key, val in yr_data | dictsort %}
+    x.push("{{ key }}");
+    y.push({{ val }});
+    {% endfor %}
+
+    var trace = {
+        x: x,
+        y: y,
+        name: 'CPD Hours',
+        type: 'bar'
+    };
+
+    var data = [trace];
+    var layout = {
+        title: {
+            text: 'Total Half-Yearly CPD Hours',
+        },
+        showlegend: false,
+        shapes: [
+            // Horizontal lines
+            {
+                type: 'line',
+                xref: 'paper',
+                x0: 0,
+                x1: 1,
+                yref: 'y',
+                y0: 25,
+                y1: 25,
+                line: {
+                    dash: 'dot',
+                    color: "#000000"
+                }
+            }
+        ]
+    };
+    var graphDiv = document.getElementById('fy_hrs_chart');
+    Plotly.newPlot(graphDiv, data, layout);
+</script>
+
+
+
+{% endblock footer %}

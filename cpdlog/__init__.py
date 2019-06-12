@@ -6,19 +6,14 @@
 
 import logging
 from logging import NullHandler
+from flask import Flask
+from cpdlog.model import create_db
 
-from cpdlog.model import Activities, get_cpd_activities, create_db
-from cpdlog.migrate_ea import import_ea_cpd_activities
-from cpdlog.report import combine_report_data, build_report
+app = Flask(__name__)
+app.config.from_object("config")
 
-__all__ = [
-    "Activities",
-    "get_cpd_activities",
-    "create_db",
-    "import_ea_cpd_activities",
-    "combine_report_data",
-    "build_report",
-]
+__all__ = ["app", "create_db"]
+
 
 # Set default logging handler to avoid "No handler found" warnings.
 logging.getLogger(__name__).addHandler(NullHandler())
