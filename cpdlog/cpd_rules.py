@@ -49,6 +49,28 @@ CPD_TYPES = {
     },
 }
 
+ACT_TYPES = [
+    "Conference",
+    "Exhibition",
+    "Meeting",
+    "Mentoring session",
+    "Online study",
+    "Other",
+    "Presentation/paper preparation",
+    "Private study - book/manual",
+    "Private study - journal/magazine",
+    "Private study - research/web articles",
+    "Private study - audio/podcast",
+    "Seminar",
+    "Technical presentation",
+    "Technical site visit",
+    "Tertiary study",
+    "Training course/session - external",
+    "Training course/session - workplace",
+    "Volunteer activity",
+    "Workshop",
+]
+
 
 CPD_MINS = {
     "yrs": 3,

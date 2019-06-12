@@ -19,6 +19,7 @@
     <caption>CPD activities</caption>
     <thead>
         <tr>
+            <th>ID</th>
             <th>Date</th>
             <th>Type</th>
             <th>Topic</th>
@@ -30,8 +31,9 @@
         {% for record in activities %}
         {% if not record.cpd_expired(3) %}
         <tr>
+            <td>{{record.act_id}}</td>
             <td>{{record.start_date}}</td>
-            <td>{{record.cpd_type}}</td>
+            <td>{{record.cpd_category}}</td>
             <td>{{record.topic}}</td>
             <td>{{record.provider}}</td>
             <td>{{record.total_hrs}}</td>
@@ -45,6 +47,7 @@
     <caption>Expired CPD activities</caption>
     <thead>
         <tr>
+            <th>ID</th>
             <th>Date</th>
             <th>Type</th>
             <th>Topic</th>
@@ -56,8 +59,9 @@
         {% for record in activities %}
         {% if record.cpd_expired(3) %}
         <tr>
+            <td>{{record.act_id}}</td>
             <td>{{record.start_date}}</td>
-            <td>{{record.cpd_type}}</td>
+            <td>{{record.cpd_category}}</td>
             <td>{{record.topic}}</td>
             <td>{{record.provider}}</td>
             <td>{{record.total_hrs}}</td>
