@@ -85,8 +85,22 @@ def get_cpd_activities(db_url):
     engine = create_engine(db_url)
     Session = sessionmaker(bind=engine)
     session = Session()
-    r = session.query(Activities)
+    r = session.query(Activities).order_by(Activities.start_date.desc())
     return r
+
+
+def get_cpd_providers(db_url):
+    providers = set()
+    for act in get_cpd_activities(db_url):
+        providers.add(act.provider)
+    return providers
+
+
+def get_locations(db_url):
+    locations = set()
+    for act in get_cpd_activities(db_url):
+        locations.add(act.location)
+    return locations
 
 
 def create_db(db_url):

@@ -18,60 +18,83 @@
     </div>
 </div>
 
-<table class="table table-sm table-striped">
-    <caption>3 Yr CPD Hours Summary</caption>
-    <thead>
-        <tr>
-            <th>CPD Type</th>
-            <th>Risk</th>
-            <th>Business</th>
-            <th>Area</th>
-            <th>Other</th>
-            <th>Total</th>
-            <th>Conditions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for key, val in type_summary.items() %}
-        <tr>
-            <th>Type <abbr title="{{ val.long_desc }}">{{ key }}</abbr> -
-                {{ val.desc }}
-            </th>
-            <td>{{ val.risk_hrs }}</td>
-            <td>{{ val.bus_hrs }}</td>
-            <td>{{ val.area_hrs }}</td>
-            <td>{{ val.other_hrs }}</td>
-            <td {% if val.total_hrs == val.limit %}class="table-warning" {% endif %}>
-                {{ val.total_hrs }}
-            </td>
-            <td>
-                {% if val.conditions %}
-                <abbr title="{{ val.conditions }}">ℹ️</abbr>
-                {% endif %}
-            </td>
+<div class="row">
+    <div class="col-8">
 
 
-        </tr>
-        {% endfor %}
+        <table class="table table-sm table-striped">
+            <caption>3 Yr CPD Type Summary</caption>
+            <thead>
+                <tr>
+                    <th>CPD Type</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, val in type_summary.items() %}
+                <tr>
+                    <th>Type <abbr title="{{ val.long_desc }}">{{ key }}</abbr> -
+                        {{ val.desc }}
+                        {% if val.conditions %}
+                        <abbr title="{{ val.conditions }}">ℹ️</abbr>
+                        {% endif %}
+                    </th>
+                    <td {% if val.total_hrs == val.limit %}class="table-warning" {% endif %}>
+                        {{ val.total_hrs }}
+                    </td>
+                </tr>
+                {% endfor %}
 
-        <tr>
-            <!-- Total Row -->
-            <th>Total</th>
-            <td {% if area_summary.risk_hrs <= mins.risk %}class="table-danger" {% endif %}>
-                {{ area_summary.risk_hrs }}</td>
-            <td {% if area_summary.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
-                {{ area_summary.bus_hrs }}</td>
-            <td {% if area_summary.area_hrs <= mins.area %}class="table-danger" {% endif %}>
-                {{ area_summary.area_hrs }}</td>
-            <td>{{ area_summary.other_hrs }}</td>
-            <td {% if area_summary.total_hrs <= mins.total %}class="table-danger" {% endif %}>
-                {{ area_summary.total_hrs }}
-            </td>
-        </tr>
+                <tr>
+                    <!-- Total Row -->
+                    <th>Total</th>
+                    <td {% if area_summary.total_hrs <= mins.total %}class="table-danger" {% endif %}>
+                        {{ area_summary.total_hrs }}
+                    </td>
+
+                </tr>
 
 
-    </tbody>
-</table>
+            </tbody>
+        </table>
+
+    </div><!-- /col -->
+    <div class="col-4">
+
+        <table class="table table-sm table-striped">
+            <caption>3 Yr CPD Subject Summary</caption>
+            <thead>
+                <tr>
+                    <th>Subject Area</th>
+                    <th>Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Risk management</th>
+                    <td {% if area_summary.risk_hrs <= mins.risk %}class="table-danger" {% endif %}>
+                        {{ area_summary.risk_hrs }}</td>
+                </tr>
+                <tr>
+                    <th>Business and management skills</th>
+                    <td {% if area_summary.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
+                        {{ area_summary.bus_hrs }}</td>
+                </tr>
+                <tr>
+                    <th>Area(s) of practice</th>
+                    <td {% if area_summary.area_hrs <= mins.area %}class="table-danger" {% endif %}>
+                        {{ area_summary.area_hrs }}</td>
+                </tr>
+                <tr>
+                    <th>Other</th>
+                    <td>{{ area_summary.other_hrs }}</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div><!-- /col -->
+</div><!-- /row -->
+
 
 <h2>Forecast CPD</h2>
 
@@ -90,41 +113,48 @@
     </small>
 </p>
 
+<div class="row">
+    <div class="col-5">
 
-<table class="table table-sm table-striped">
-    <caption>2 Yr Summary</caption>
-    <thead>
-        <tr>
-            <th>CPD Type</th>
-            <th>Risk</th>
-            <th>Business</th>
-            <th>Area</th>
-            <th>Other</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
+        <table class="table table-sm table-striped">
+            <caption>2 Yr CPD Subject Summary</caption>
+            <thead>
+                <tr>
+                    <th>Subject Area</th>
+                    <th>Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Risk management</th>
+                    <td {% if area_summary2.risk_hrs <= mins.risk %}class="table-danger" {% endif %}>
+                        {{ area_summary2.risk_hrs }}</td>
+                </tr>
+                <tr>
+                    <th>Business and management skills</th>
+                    <td {% if area_summary2.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
+                        {{ area_summary2.bus_hrs }}</td>
+                </tr>
+                <tr>
+                    <th>Area(s) of practice</th>
+                    <td {% if area_summary2.area_hrs <= mins.area %}class="table-danger" {% endif %}>
+                        {{ area_summary2.area_hrs }}</td>
+                </tr>
+                <tr>
+                    <th>Other</th>
+                    <td>{{ area_summary2.other_hrs }}</td>
+                </tr>
+                <tr>
+                    <th>Total</th>
+                    <td {% if area_summary2.total_hrs <= mins.total %}class="table-danger" {% endif %}>
+                        {{ area_summary2.total_hrs }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-        <tr>
-
-            <!-- Total Row -->
-            <th>Total</td>
-            <td {% if area_summary2.risk_hrs <= mins.risk %}class="table-danger" {% endif %}>
-                {{ area_summary2.risk_hrs }}</td>
-            <td {% if area_summary2.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
-                {{ area_summary2.bus_hrs }}</td>
-            <td {% if area_summary2.area_hrs <= mins.area %}class="table-danger" {% endif %}>
-                {{ area_summary2.area_hrs }}</td>
-            <td>{{ area_summary2.other_hrs }}</td>
-            <td {% if area_summary2.total_hrs <= mins.total %}class="table-danger" {% endif %}>
-                {{ area_summary2.total_hrs }}
-            </td>
-
-        </tr>
-
-    </tbody>
-</table>
-
+    </div><!-- /col -->
+</div><!-- /row -->
 
 
 {% endblock container%}

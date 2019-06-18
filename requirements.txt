@@ -3,3 +3,4 @@ jinja2
 python-dateutil
 flask
 flask_wtf
+pytoml

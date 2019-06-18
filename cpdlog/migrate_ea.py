@@ -88,7 +88,9 @@ def import_ea_cpd_activities(db_url: str, filename):
             log.info("Skipped existing entry %s", a.ext_ref)
             continue
 
-        notes = a.learning_outcome
+        notes = ''
+        if a.learning_outcome:
+            notes += a.learning_outcome
         if a.notes:
             notes += a.notes
 

@@ -58,12 +58,22 @@
 
     <div class="form-group">
         {{ form.provider.label }}:
-        {{ form.provider(class="form-control") }}
+        {{ form.provider(class="form-control", list="provider_datalist") }}
+        <datalist id="provider_datalist" class="form-control" hidden>
+            {% for entry in providers %}
+            <option value="{{ entry }}">
+                {% endfor %}
+        </datalist>
     </div>
 
     <div class="form-group">
         {{ form.location.label }}:
-        {{ form.location(class="form-control") }}
+        {{ form.location(class="form-control", list="location_datalist") }}
+        <datalist id="location_datalist" class="form-control" hidden>
+            {% for entry in locations %}
+            <option value="{{ entry }}">
+                {% endfor %}
+        </datalist>
     </div>
 
     <div class="form-group">

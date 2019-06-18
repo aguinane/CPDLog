@@ -1,9 +1,10 @@
+import pytoml as toml
 from flask_wtf import FlaskForm
 from wtforms import FileField
 from wtforms.validators import DataRequired
 from wtforms import StringField, SelectField, DateField, FloatField, TextAreaField
 
-from .cpd_rules import CPD_TYPES, ACT_TYPES
+from .cpd_rules import CPD_RULES,CPD_TYPES
 
 
 class FileForm(FlaskForm):
@@ -22,7 +23,7 @@ class ActivityForm(FlaskForm):
     cpd_category = SelectField(u"CPD Category", choices=cpd_categories)
 
     act_types = []
-    for act in sorted(ACT_TYPES):
+    for act in sorted(CPD_RULES['activity_types']):
         act_types.append((act, act))
     act_type = SelectField(u"Activity Type", choices=act_types)
 

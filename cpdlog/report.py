@@ -7,7 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 from sqlalchemy import create_engine
 
-from .cpd_rules import CPD_TYPES, CPD_MINS
+from .cpd_rules import CPD_RULES, CPD_TYPES, CPD_MINS
 
 log = logging.getLogger(__name__)
 
@@ -40,11 +40,17 @@ class CPDTotal(object):
 
     @property
     def conditions(self):
-        return CPD_TYPES[self.cpd_type]["conditions"]
+        try:
+            return CPD_TYPES[self.cpd_type]["conditions"]
+        except KeyError:
+            return ""
 
     @property
     def cpd_limit(self):
-        return CPD_TYPES[self.cpd_type]["limit"]
+        try:
+            return CPD_TYPES[self.cpd_type]["limit"]
+        except KeyError:
+            return None
 
 
 def group_activities_by_cpd_type(activities, years=3):
@@ -93,23 +99,16 @@ def build_summary_table(activities, years=3):
         type_summary[row.cpd_type] = {
             "desc": row.cpd_desc,
             "long_desc": row.cpd_long_desc,
-            "risk_hrs": row.risk_hrs,
-            "bus_hrs": row.bus_hrs,
-            "area_hrs": row.area_hrs,
-            "other_hrs": row.other_hrs,
             "total_hrs": row.total_hrs,
             "limit": row.cpd_limit,
             "conditions": row.conditions,
         }
     area_summary = {
-        "desc": "Total",
         "risk_hrs": sum(row.risk_hrs for row in totals),
         "bus_hrs": sum(row.bus_hrs for row in totals),
         "area_hrs": sum(row.area_hrs for row in totals),
         "other_hrs": sum(row.other_hrs for row in totals),
         "total_hrs": sum(row.total_hrs for row in totals),
-        "limit": 150,
-        "conditions": CPD_MINS["conditions"],
     }
     return type_summary, area_summary
 

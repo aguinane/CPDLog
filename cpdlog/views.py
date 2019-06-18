@@ -5,7 +5,8 @@ from flask import url_for, redirect
 from pathlib import Path
 from . import app
 from cpdlog.forms import FileForm, ActivityForm
-from cpdlog.model import get_cpd_activities, Activities, SubjectArea
+from cpdlog.model import Activities, SubjectArea
+from cpdlog.model import get_cpd_activities, get_cpd_providers, get_locations
 from cpdlog.report import combine_report_data
 from cpdlog.migrate_ea import import_ea_cpd_activities
 from sqlalchemy import create_engine
@@ -72,7 +73,12 @@ def new_activity():
         flash("New activity created!", category="success")
         return redirect(url_for("index"))
 
-    return render_template("activity_new.html", form=form)
+    providers = get_cpd_providers(DB_URL)
+    locations = get_locations(DB_URL)
+
+    return render_template(
+        "activity_new.html", form=form, providers=providers, locations=locations
+    )
 
 
 @app.route("/import_ea", methods=["GET", "POST"])
