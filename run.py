@@ -1,10 +1,11 @@
 import logging
-import webbrowser
+from pathlib import Path
 from cpdlog import create_db
 from cpdlog import app
 from cpdlog.views import *
 
 
+Path('data/').mkdir(exist_ok=True) 
 db_url = "sqlite:///data/cpdlog.db"
 create_db(db_url)
 
@@ -14,5 +15,4 @@ if __name__ == "__main__":
     logger = logging.getLogger()  # Root Logger
     logging.basicConfig(level="INFO", format=LOG_FORMAT)
 
-    # import_ea_file()
     app.run(threaded=False)
