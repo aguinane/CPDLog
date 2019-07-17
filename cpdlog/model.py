@@ -23,35 +23,14 @@ class Activities(Base):
     duration = Column(Float)
     notes = Column(String)
     ext_ref = Column(String)
-    subjectareas = relationship(
-        "SubjectArea", lazy=True, cascade="all, delete, delete-orphan"
-    )
+    practice_hrs = Column(Float)
+    risk_hrs = Column(Float)
+    business_hrs = Column(Float)
 
     def __repr__(self):
         return "<Activity {} {} {}>".format(
             self.ext_ref, self.start_date, self.act_type
         )
-
-    @property
-    def risk_hrs(self):
-        try:
-            return self.subjectareas[0].risk_hrs
-        except IndexError:
-            return 0.0
-
-    @property
-    def bus_hrs(self):
-        try:
-            return self.subjectareas[0].business_hrs
-        except IndexError:
-            return 0.0
-
-    @property
-    def area_hrs(self):
-        try:
-            return self.subjectareas[0].practice_hrs
-        except IndexError:
-            return 0.0
 
     @property
     def total_hrs(self):
@@ -70,14 +49,6 @@ class Activities(Base):
         if diff.days < 365.25 * years:
             return False
         return True
-
-
-class SubjectArea(Base):
-    __tablename__ = "area"
-    act_id = Column(Integer, ForeignKey("activities.act_id"), primary_key=True)
-    practice_hrs = Column(Float)
-    risk_hrs = Column(Float)
-    business_hrs = Column(Float)
 
 
 def get_cpd_activities(db_url):

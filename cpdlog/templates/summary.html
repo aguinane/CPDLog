@@ -77,13 +77,13 @@
                 </tr>
                 <tr>
                     <th>Business and management skills</th>
-                    <td {% if area_summary.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
-                        {{ area_summary.bus_hrs }}</td>
+                    <td {% if area_summary.business_hrs <= mins.bus %}class="table-danger" {% endif %}>
+                        {{ area_summary.business_hrs }}</td>
                 </tr>
                 <tr>
                     <th>Area(s) of practice</th>
-                    <td {% if area_summary.area_hrs <= mins.area %}class="table-danger" {% endif %}>
-                        {{ area_summary.area_hrs }}</td>
+                    <td {% if area_summary.practice_hrs <= mins.area %}class="table-danger" {% endif %}>
+                        {{ area_summary.practice_hrs }}</td>
                 </tr>
                 <tr>
                     <th>Other</th>
@@ -132,13 +132,13 @@
                 </tr>
                 <tr>
                     <th>Business and management skills</th>
-                    <td {% if area_summary2.bus_hrs <= mins.bus %}class="table-danger" {% endif %}>
-                        {{ area_summary2.bus_hrs }}</td>
+                    <td {% if area_summary2.business_hrs <= mins.bus %}class="table-danger" {% endif %}>
+                        {{ area_summary2.business_hrs }}</td>
                 </tr>
                 <tr>
                     <th>Area(s) of practice</th>
-                    <td {% if area_summary2.area_hrs <= mins.area %}class="table-danger" {% endif %}>
-                        {{ area_summary2.area_hrs }}</td>
+                    <td {% if area_summary2.practice_hrs <= mins.area %}class="table-danger" {% endif %}>
+                        {{ area_summary2.practice_hrs }}</td>
                 </tr>
                 <tr>
                     <th>Other</th>

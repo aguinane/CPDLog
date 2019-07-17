@@ -4,7 +4,7 @@ from openpyxl import load_workbook
 from dateutil.parser import parse
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .model import Activities, SubjectArea
+from .model import Activities
 
 EA_CATEGORIES = {
     "Type I": "A",
@@ -48,7 +48,7 @@ def parse_ea_export(filename) -> List["ActivityEA"]:
     for row in new_rows:
         activity = ActivityEA(*row)
         activities.append(activity)
-    return activities
+    return reversed(activities)
 
 
 class ActivityEA:
@@ -64,8 +64,8 @@ class ActivityEA:
         self.location = args[8]
         self.total_hrs = args[9]
         self.risk_hrs = args[10]
-        self.bus_hrs = args[11]
-        self.area_hrs = args[12]
+        self.business_hrs = args[11]
+        self.practice_hrs = args[12]
         self.notes = args[13]
         self.learning_outcome = args[14]
 
@@ -88,7 +88,7 @@ def import_ea_cpd_activities(db_url: str, filename):
             log.info("Skipped existing entry %s", a.ext_ref)
             continue
 
-        notes = ''
+        notes = ""
         if a.learning_outcome:
             notes += a.learning_outcome
         if a.notes:
@@ -105,16 +105,10 @@ def import_ea_cpd_activities(db_url: str, filename):
             duration=a.total_hrs,
             notes=notes,
             ext_ref=a.ext_ref,
+            practice_hrs=a.practice_hrs,
+            risk_hrs=a.risk_hrs,
+            business_hrs=a.business_hrs,
         )
         session.add(activity)
         session.commit()
-        act_id = activity.act_id
-        area = SubjectArea(
-            act_id=act_id,
-            practice_hrs=a.area_hrs,
-            risk_hrs=a.risk_hrs,
-            business_hrs=a.bus_hrs,
-        )
-        session.add(area)
-
     session.commit()

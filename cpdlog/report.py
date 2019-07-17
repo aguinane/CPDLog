@@ -16,13 +16,13 @@ log = logging.getLogger(__name__)
 class CPDTotal(object):
     cpd_type = attr.ib()
     risk_hrs = attr.ib()
-    bus_hrs = attr.ib()
-    area_hrs = attr.ib()
+    business_hrs = attr.ib()
+    practice_hrs = attr.ib()
     other_hrs = attr.ib()
 
     @property
     def total_hrs(self):
-        total = self.risk_hrs + self.bus_hrs + self.area_hrs + self.other_hrs
+        total = self.risk_hrs + self.business_hrs + self.practice_hrs + self.other_hrs
         if not self.cpd_limit:
             return total  # No limits
         if self.cpd_limit > total:
@@ -67,16 +67,16 @@ def group_activities_by_cpd_type(activities, years=3):
 
 def sum_cpd_hours(activities):
     risk_hrs = 0
-    bus_hrs = 0
-    area_hrs = 0
+    business_hrs = 0
+    practice_hrs = 0
     total_hrs = 0
     for record in activities:
         risk_hrs += record.risk_hrs
-        bus_hrs += record.bus_hrs
-        area_hrs += record.area_hrs
+        business_hrs += record.business_hrs
+        practice_hrs += record.practice_hrs
         total_hrs += record.total_hrs
-    other_hrs = total_hrs - risk_hrs - bus_hrs - area_hrs
-    return risk_hrs, bus_hrs, area_hrs, other_hrs
+    other_hrs = total_hrs - risk_hrs - business_hrs - practice_hrs
+    return risk_hrs, business_hrs, practice_hrs, other_hrs
 
 
 def get_cpd_totals(activities, years=3):
@@ -85,8 +85,8 @@ def get_cpd_totals(activities, years=3):
     cpd_group = group_activities_by_cpd_type(activities, years)
     for cpd_type in cpd_group:
         activities = cpd_group[cpd_type]
-        risk_hrs, bus_hrs, area_hrs, other_hrs = sum_cpd_hours(activities)
-        t = CPDTotal(cpd_type, risk_hrs, bus_hrs, area_hrs, other_hrs)
+        risk_hrs, business_hrs, practice_hrs, other_hrs = sum_cpd_hours(activities)
+        t = CPDTotal(cpd_type, risk_hrs, business_hrs, practice_hrs, other_hrs)
         totals.append(t)
     return totals
 
@@ -105,8 +105,8 @@ def build_summary_table(activities, years=3):
         }
     area_summary = {
         "risk_hrs": sum(row.risk_hrs for row in totals),
-        "bus_hrs": sum(row.bus_hrs for row in totals),
-        "area_hrs": sum(row.area_hrs for row in totals),
+        "business_hrs": sum(row.business_hrs for row in totals),
+        "practice_hrs": sum(row.practice_hrs for row in totals),
         "other_hrs": sum(row.other_hrs for row in totals),
         "total_hrs": sum(row.total_hrs for row in totals),
     }

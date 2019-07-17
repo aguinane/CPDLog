@@ -3,9 +3,10 @@ from flask import render_template
 from flask import flash
 from flask import url_for, redirect
 from pathlib import Path
+import uuid
 from . import app
 from cpdlog.forms import FileForm, ActivityForm
-from cpdlog.model import Activities, SubjectArea
+from cpdlog.model import Activities
 from cpdlog.model import get_cpd_activities, get_cpd_providers, get_locations
 from cpdlog.report import combine_report_data
 from cpdlog.migrate_ea import import_ea_cpd_activities
@@ -44,6 +45,13 @@ def new_activity():
         Session = sessionmaker(bind=engine)
         session = Session()
 
+        practice_hrs = form.practice_hrs.data
+        risk_hrs = form.risk_hrs.data
+        business_hrs = form.business_hrs.data
+        other_hrs = form.other_hrs.data
+        duration = practice_hrs + risk_hrs + business_hrs + other_hrs
+
+        ext_ref = str(uuid.uuid4())[0:8].upper()
         activity = Activities(
             cpd_category=form.cpd_category.data,
             start_date=form.start_date.data,
@@ -52,22 +60,14 @@ def new_activity():
             topic=form.topic.data,
             provider=form.provider.data,
             location=form.location.data,
-            duration=form.duration.data,
+            duration=duration,
             notes=form.notes.data,
-            ext_ref=None,
+            ext_ref=ext_ref,
+            practice_hrs=practice_hrs,
+            risk_hrs=risk_hrs,
+            business_hrs=business_hrs,
         )
         session.add(activity)
-        session.commit()
-        act_id = activity.act_id
-        """
-        area = SubjectArea(
-            act_id=act_id,
-            practice_hrs=form.area_hrs.data,
-            risk_hrs=form.risk_hrs.data,
-            business_hrs=form.bus_hrs.data,
-        )
-        session.add(area)
-        """
         session.commit()
 
         flash("New activity created!", category="success")
