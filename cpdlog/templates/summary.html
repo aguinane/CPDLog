@@ -114,41 +114,51 @@
 </p>
 
 <div class="row">
-    <div class="col-5">
+    <div class="col-6">
 
         <table class="table table-sm table-striped">
             <caption>2 Yr CPD Subject Summary</caption>
             <thead>
                 <tr>
                     <th>Subject Area</th>
-                    <th>Hours</th>
+                    <th>Requirement</th>
+                    <th>Forecast Hours</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <th>Risk management</th>
+                    <td>{{mins.risk}}</td>
                     <td {% if area_summary2.risk_hrs <= mins.risk %}class="table-danger" {% endif %}>
                         {{ area_summary2.risk_hrs }}</td>
+
                 </tr>
                 <tr>
                     <th>Business and management skills</th>
+                    <td>{{mins.bus}}</td>
                     <td {% if area_summary2.business_hrs <= mins.bus %}class="table-danger" {% endif %}>
                         {{ area_summary2.business_hrs }}</td>
+
                 </tr>
                 <tr>
                     <th>Area(s) of practice</th>
+                    <td>{{mins.area}}</td>
                     <td {% if area_summary2.practice_hrs <= mins.area %}class="table-danger" {% endif %}>
                         {{ area_summary2.practice_hrs }}</td>
+
                 </tr>
                 <tr>
                     <th>Other</th>
+                    <td></td>
                     <td>{{ area_summary2.other_hrs }}</td>
                 </tr>
                 <tr>
                     <th>Total</th>
+                    <td>{{mins.total}}</td>
                     <td {% if area_summary2.total_hrs <= mins.total %}class="table-danger" {% endif %}>
                         {{ area_summary2.total_hrs }}
                     </td>
+
                 </tr>
             </tbody>
         </table>
