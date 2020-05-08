@@ -39,6 +39,5 @@ class ActivityForm(FlaskForm):
     topic = StringField("Topic", validators=[DataRequired()])
     provider = StringField("Provider", validators=[DataRequired()])
     location = StringField("Location", validators=[DataRequired()])
-    notes = TextAreaField("Learning Outcomes and Notes", validators=[DataRequired()])
-
-    
+    learning_outcome = TextAreaField("Learning Outcome", validators=[DataRequired()])
+    notes = TextAreaField("Notes")

@@ -38,7 +38,7 @@ def activities():
 
 @app.route("/new_activity", methods=["GET", "POST"])
 def new_activity():
-    """ Import meter data """
+    """ Create new CPD activity """
 
     form = ActivityForm()
     if form.validate_on_submit():
@@ -62,6 +62,7 @@ def new_activity():
             provider=form.provider.data,
             location=form.location.data,
             duration=duration,
+            learning_outcome=form.learning_outcome.data,
             notes=form.notes.data,
             ext_ref=ext_ref,
             practice_hrs=practice_hrs,
@@ -84,7 +85,7 @@ def new_activity():
 
 @app.route("/import_ea", methods=["GET", "POST"])
 def import_ea():
-    """ Import meter data """
+    """ Import cpd data """
 
     form = FileForm()
     if form.validate_on_submit():

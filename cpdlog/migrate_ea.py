@@ -88,12 +88,6 @@ def import_ea_cpd_activities(db_url: str, filename):
             log.info("Skipped existing entry %s", a.ext_ref)
             continue
 
-        notes = ""
-        if a.learning_outcome:
-            notes += a.learning_outcome
-        if a.notes:
-            notes += a.notes
-
         activity = Activities(
             cpd_category=a.cpd_category,
             start_date=a.start_date,
@@ -103,7 +97,8 @@ def import_ea_cpd_activities(db_url: str, filename):
             provider=a.provider,
             location=a.location,
             duration=a.total_hrs,
-            notes=notes,
+            learning_outcome=a.learning_outcome,
+            notes=a.notes,
             ext_ref=a.ext_ref,
             practice_hrs=a.practice_hrs,
             risk_hrs=a.risk_hrs,

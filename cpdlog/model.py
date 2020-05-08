@@ -21,6 +21,7 @@ class Activities(Base):
     provider = Column(String)
     location = Column(String)
     duration = Column(Float)
+    learning_outcome = Column(String)
     notes = Column(String)
     ext_ref = Column(String)
     practice_hrs = Column(Float)

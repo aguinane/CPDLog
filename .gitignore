@@ -105,3 +105,4 @@ venv.bak/
 
 data/*
 cpd_report.html
+.vscode

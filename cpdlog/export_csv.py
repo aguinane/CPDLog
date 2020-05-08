@@ -1,6 +1,5 @@
 import logging
 import csv
-from typing import List
 
 log = logging.getLogger(__name__)
 
@@ -20,6 +19,7 @@ def build_activity_export(file_path, activities):
         "area of practice hrs",
         "risk hrs",
         "business hrs",
+        "learning_outcome",
         "notes",
     ]
 
@@ -38,15 +38,16 @@ def build_activity_export(file_path, activities):
             act.practice_hrs,
             act.risk_hrs,
             act.business_hrs,
+            act.learning_outcome,
             act.notes,
         ]
         rows.append(row)
 
-    with open(file_path, 'w', newline='') as csvfile:
+    with open(file_path, "w", newline="") as csvfile:
         cwriter = csv.writer(
-            csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL
+            csvfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
         )
         cwriter.writerow(headings)
         for row in rows:
             cwriter.writerow(row)
-    log.info('Created %s', file_path)
+    log.info("Created %s", file_path)
