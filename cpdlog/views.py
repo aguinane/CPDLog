@@ -1,8 +1,8 @@
 import os
+from datetime import datetime
 from flask import render_template
 from flask import flash
 from flask import url_for, redirect, send_file
-from pathlib import Path
 import uuid
 from . import app
 from cpdlog.forms import FileForm, ActivityForm
@@ -10,6 +10,7 @@ from cpdlog.model import Activities
 from cpdlog.model import get_cpd_activities, get_cpd_providers, get_locations
 from cpdlog.report import combine_report_data
 from cpdlog.migrate_ea import import_ea_cpd_activities
+from cpdlog.import_csv import import_cpd_activities
 from cpdlog.export_csv import build_activity_export
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -98,11 +99,32 @@ def import_ea():
     return render_template("importea.html", form=form)
 
 
-@app.route("/cpd_export.csv", methods=["GET", "POST"])
-def export_csv():
-    """ Import meter data """
+@app.route("/import_csv", methods=["GET", "POST"])
+def import_csv():
+    """ Import CPD data """
+    form = FileForm()
+    if form.validate_on_submit():
+        file_path = os.path.abspath("data/imported.csv")
+        form.upload_file.data.save(file_path)
+        import_cpd_activities(DB_URL, file_path)
+        flash("Activities imported", category="success")
+        return redirect(url_for("index"))
 
-    file_path = os.path.abspath("./data/export.csv")
+    return render_template("importcsv.html", form=form)
+
+
+@app.route("/cpd_export", methods=["GET", "POST"])
+def export_csv():
+    """ Export CPD data """
+    today = datetime.now().strftime("%Y%m%d")
+    file_name = f"cpd_export_{today}.csv"
+    file_dir = os.path.abspath(f"./data")
+    file_path = os.path.join(file_dir, file_name)
     activities = get_cpd_activities(DB_URL)
     build_activity_export(file_path, activities)
-    return send_file(file_path, file_path)
+    return send_file(
+        file_path,
+        mimetype="text/csv",
+        as_attachment=True,
+        attachment_filename=file_name,
+    )
