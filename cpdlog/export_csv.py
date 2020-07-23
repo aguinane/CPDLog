@@ -43,7 +43,7 @@ def build_activity_export(file_path, activities):
         ]
         rows.append(row)
 
-    with open(file_path, "w", newline="") as csvfile:
+    with open(file_path, "w", newline="", encoding="UTF-8") as csvfile:
         cwriter = csv.writer(
             csvfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
         )
