@@ -1,0 +1,34 @@
+<form method="POST" action="{{ url_for('new_activity') }}" enctype="multipart/form-data">
+
+    <label for="topic">Topic</label>:
+    <input id="topic" name="topic" required type="text" value="">
+
+    <label for="date">Date</label>:
+    <input id="date" name="date" required type="date" value="">
+
+    <label for="duration">Duration (hrs)</label>:
+    <input id="duration" min="0" name="duration" step="0.25" type="number" value="0.0">
+
+    <label for="cpd_category">CPD Category</label>:
+    <select id="cpd_category" name="cpd_category">
+        <option value="A">A: Tertiary Education</option>
+        <option value="B">B: Industry Education</option>
+        <option value="C">C: Workplace Learning</option>
+        <option value="D">D: Private Study</option>
+        <option value="E">E: Service</option>
+        <option value="F">F: Presentations and papers</option>
+        <option value="G">G: Industry Involvement (for academics)</option>
+        <option value="H">H: Other</option>
+    </select>
+
+    <label for="provider">Provider</label>:
+    <input id="provider" list="provider_datalist" name="provider" required type="text" value="">
+
+    <label for="learning_outcome">Learning Outcome</label>:
+    <textarea id="learning_outcome" name="learning_outcome" required></textarea>
+
+    <label for="notes">Notes</label>:
+    <textarea id="notes" name="notes"></textarea>
+
+    <button id='submit-data' type="submit">Create</button>
+</form>

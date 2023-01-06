@@ -1,0 +1,4 @@
+CPDLog
+act_id,act_date,topic,cpd_hours,cpd_type,provider,learning_outcome,notes
+441DF80B,2023-01-06,Example Training Course,2.0,B,Company ABC,I learnt some things,
+7F512A4F,2023-01-07,Example Webinar,1.0,B,Company 123,I learnt more things,

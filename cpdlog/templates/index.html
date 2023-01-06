@@ -1,17 +1,75 @@
 {% extends "layout.html" %}
-{% set active_page = active_page|default('homepage') -%}
 {% block title %}CPD Log{% endblock %}
 {% block container %}
 
+<h1>CPDLog</h1>
 
-<h3>Import</h3>
+<p>There is a total of {{summary.total_hours}}hrs recorded over the last 3 years.
+    <br>Of that, {{expiring}}hrs will be expiring in the next year
+    and {{150 - (summary.total_hours - expiring)}}hrs will need to be added.
 
-<p>You can import from an Engineers Australia export <a href="import_ea">here</a>.</p>
-<p>You can re-import from this site's csv export <a href="import_csv">here</a>.</p>
+</p>
 
-<h3>Export</h3>
+<div id="quarter_totals_chart" style="max-width: 100%; height: 400px;"></div>
 
-<p>You can also <a href="{{url_for('export_csv')}}">export to CSV</a>.</p>
 
+<h2>Activities</h2>
+
+<dialog id="newActivity">
+    {% include "activity_form.html" %}
+    <button onclick="document.getElementById('newActivity').close()">Close</button>
+</dialog>
+
+<button onclick="document.getElementById('newActivity').showModal()">Record New</button>
+
+
+{% for activity in activities %}
+{% if not activity.expired(3) %}
+
+<details>
+    <summary>
+        <em>{{activity.act_date}}</em> {{activity.topic}}
+        <em>[{{activity.cpd_hours}}hrs]</em>
+    </summary>
+    <p>
+    <dl>
+        <dt>CPD Type:</dt>
+        <dd>{{activity.cpd_type_code}}: {{activity.cpd_type_desc}}</dd>
+
+        {% if activity.provider %}
+        <dt>Provider:</dt>
+        <dd>{{activity.provider}}</dd>
+        {% endif %}
+
+        <dt>Learning Outcome:</dt>
+        <dd>{{activity.learning_outcome}}</dd>
+
+        {% if activity.notes %}
+        <dt>Notes:</dt>
+        <dd>{{activity.notes}}</dd>
+        {% endif %}
+    </dl>
+
+    </p>
+</details>
+
+
+{% endif %}
+{% endfor %}
+
+
+<p>Activities older then 3 years old are not shown.</p>
+
+
+
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript'>
+    var graphs = {{ graphJSON | safe}};
+    Plotly.plot('quarter_totals_chart', graphs, {});
+</script>
 
 {% endblock container%}
+
+{% block footer %}
+<a href="#">Back to top ⬆</a>
+{% endblock footer%}

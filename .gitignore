@@ -107,3 +107,4 @@ data/*
 cpd_report.html
 .vscode
 *.db
+*.csv
