@@ -2,7 +2,7 @@
 
 This program can be used to record and analyse Continued Professional Development (CPD) Activities. It will create CSV file that lets you add new activities.
 
-## Add an entry
+## Install
 
 ```sh
 pip install git+https://github.com/aguinane/CPDLog.git
