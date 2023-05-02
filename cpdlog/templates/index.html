@@ -4,13 +4,28 @@
 
 <h1>CPDLog</h1>
 
-<p>There is a total of {{summary.total_hours}}hrs recorded over the last 3 years.
-    <br>Of that, {{expiring}}hrs will be expiring in the next year
-    and {{150 - (summary.total_hours - expiring)}}hrs will need to be added.
-
+<p>There is a total of {{summary.total_hours}}h recorded over the last 3 years.
+    {% if summary.total_hours > 150.0 %}
+    ({{(summary.total_hours - 150)}}h more then needed!)
+    {% else %}
+    <strong>({{(150 - summary.total_hours)}}h less then needed!)</strong>
+    {% endif %}
+    <br>Of that, {{expiring}}h will be expiring in the next year
+    and {{150 - (summary.total_hours - expiring)}}h will need to be added.
+    <br>
+    There are {{(summary.total_hours - summary.total_non_tech_hours)}}h of technical
+    and {{summary.total_non_tech_hours}}h of non-technical activities.
 </p>
 
-<div id="quarter_totals_chart" style="max-width: 100%; height: 400px;"></div>
+{% if summary.total_non_tech_hours > 37.5 %}
+<p>
+    More than 37.5h of non-technical hours are recorded, so further hours are not included in the totals.
+</p>
+{% endif %}
+
+<div id="quarters_totals_chart" style="max-width: 100%; height: 400px;"></div>
+
+<div id="types_totals_chart" style="max-width: 100%; height: 300px;"></div>
 
 
 <h2>Activities</h2>
@@ -64,8 +79,12 @@
 
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 <script type='text/javascript'>
-    var graphs = {{ graphJSON | safe}};
-    Plotly.plot('quarter_totals_chart', graphs, {});
+    var quartersgraph = {{ quarters_graph_json | safe}};
+    Plotly.plot('quarters_totals_chart', quartersgraph, {});
+</script>
+<script type='text/javascript'>
+    var typesgraph = {{ types_graph_json | safe}};
+    Plotly.plot('types_totals_chart', typesgraph, {});
 </script>
 
 {% endblock container%}

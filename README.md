@@ -2,6 +2,8 @@
 
 This program can be used to record and analyse Continued Professional Development (CPD) Activities. It will create CSV file that lets you add new activities.
 
+CPD Rules are based on the [BPEQ](https://bpeq.qld.gov.au/cpd/) and [Engineers Australia](https://www.engineersaustralia.org.au/sites/default/files/content-files/2016-12/cpd_types_and_conditions_march_2014.pdf) conditions. 
+
 ## Install
 
 ```sh
@@ -57,7 +59,6 @@ A web GUI is also available to be generated based on the CSV file.
 
 !["Summary Screenshot"](docs/web-summary.png "Summary Screenshot") !["New Screenshot"](docs/web-new.png "New Screenshot")
 
-CPD Rules are based on the EA [Types & Conditions](https://www.engineersaustralia.org.au/sites/default/files/content-files/2016-12/cpd_types_and_conditions_march_2014.pdf)
 
 
 ## Logfile location
