@@ -1,15 +1,15 @@
-from datetime import datetime
+from datetime import date
 import tempfile
 from pathlib import Path
 from cpdlog import Activity
-from cpdlog import save_logfile
+from cpdlog import save_logfile, load_logfile
 from cpdlog.logfile import check_create_logfile
 
 
 def test_example_act():
     """Create an Activity and test attributes"""
 
-    today = datetime.now().date()
+    today = date.today()
     act = Activity(
         act_date=today,
         topic="my topic",
@@ -38,3 +38,16 @@ def test_empty_logfile():
         save_logfile(logfile, [], append=False)
         num_act = check_create_logfile(logfile)
         assert num_act == 0
+
+
+def test_example_logfile():
+    """Use existing logfile"""
+
+    logfile = Path("examples") / "cpdlog.csv"
+    activities = load_logfile(logfile)
+    assert len(activities) == 2
+    first = activities[-1]
+    assert first.act_id == "441DF80B"
+    assert first.act_date == date(2023, 1, 6)
+    assert first.topic == "Example Training Course"
+    assert first.technical is False

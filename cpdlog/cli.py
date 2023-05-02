@@ -24,6 +24,7 @@ def new(
     topic: str = typer.Option(..., prompt=True),
     hours: float = typer.Option(..., prompt=True),
     cpd_type: CPDType = typer.Option("B", prompt=CPD_TYPE_PROMPT, case_sensitive=False),
+    technical: bool = typer.Option(False, prompt=True),
     provider: str = typer.Option("", prompt=True),
     learning_outcome: str = typer.Option(..., prompt=True),
 ):
@@ -35,6 +36,7 @@ def new(
         topic=topic,
         cpd_hours=hours,
         cpd_type=cpd_type,
+        technical=technical,
         provider=provider,
         learning_outcome=learning_outcome,
     )

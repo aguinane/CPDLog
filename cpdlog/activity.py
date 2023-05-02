@@ -2,7 +2,7 @@ from datetime import date
 from enum import Enum
 from uuid import uuid4
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 CPD_TYPES = {
     "A": "Tertiary Education",
@@ -12,8 +12,19 @@ CPD_TYPES = {
     "E": "Service to Industry",
     "F": "Academic Preparation",
     "G": "Industry Engagement",
-    "H": "Other",
 }
+
+CPD_TYPE_MAX = {
+    "A": None,
+    "B": None,
+    "C": 75.0,
+    "D": 18.0,
+    "E": 50.0,
+    "F": 45.0,
+    "G": None,
+}
+
+MAX_NON_TECHNICAL = 37.5
 
 
 class CPDType(Enum):
@@ -24,7 +35,6 @@ class CPDType(Enum):
     E = "E"
     F = "F"
     G = "G"
-    H = "H"
 
 
 def create_id() -> str:
@@ -38,6 +48,7 @@ class Activity(BaseModel):
     topic: str
     cpd_hours: float
     cpd_type: CPDType
+    technical: bool = False
     provider: str = ""
     learning_outcome: str
     notes: str = ""
@@ -76,3 +87,9 @@ class Activity(BaseModel):
         if self.act_date.month <= 9:
             return 3
         return 4
+
+    @validator("act_date")
+    def ensure_date_range(cls, v):
+        if v > date.today():
+            raise ValueError("Cannot be in future")
+        return v
