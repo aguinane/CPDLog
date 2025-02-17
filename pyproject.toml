@@ -13,29 +13,25 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 keywords = ["CPD"]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dynamic = ["version", "description"]
-dependencies = ["typer", "cheroot", "pydantic", "plotly", "pandas", "flask"]
+dependencies = [
+    "typer",
+    "cheroot",
+    "pydantic",
+    "plotly==5.24.1",
+    "pandas",
+    "flask",
+]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "mypy"]
-dev = [
-    "black",
-    "isort",
-    "flake8",
-    "flake8-bugbear",
-    "pep8-naming",
-    "flake8-builtins",
-]
+test = ["pytest", "pytest-cov", "ruff"]
 
 [project.urls]
 Source = "https://github.com/aguinane/CPDLog/"
 
 [project.scripts]
 cpdlog = "cpdlog.cli:app"
-
-[tool.isort]
-profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "-ra --failed-first --showlocals --durations=3 --cov=cpdlog"
@@ -47,3 +43,6 @@ omit = ["*/version.py", "*/__main__.py"]
 show_missing = true
 skip_empty = true
 fail_under = 85
+
+[tool.ruff.lint]
+select = ["A", "B", "E", "F", "I", "N", "PERF", "RUF", "SIM", "UP"]

@@ -1,6 +1,6 @@
-""" Record and build reports on CPD Activities """
+"""Record and build reports on CPD Activities"""
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from .activity import Activity
 from .logfile import load_logfile, save_logfile

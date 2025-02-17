@@ -1,10 +1,12 @@
+import os
+import webbrowser
 from datetime import datetime
 from pathlib import Path
-import os
+
 import typer
 from cheroot.wsgi import Server
-import webbrowser
-from .activity import Activity, CPDType, CPD_TYPES
+
+from .activity import CPD_TYPES, Activity, CPDType
 from .logfile import check_create_logfile, load_logfile, save_logfile
 from .summary import get_cpd_summary
 from .views import app as webapp
@@ -15,6 +17,14 @@ app = typer.Typer()
 DEFAULT_PATH = Path(os.getenv("CPD_LOG_FILE", "cpdlog.csv"))
 CPD_TYPE_PROMPT = "\n".join([f"{i}: {j}" for i, j in CPD_TYPES.items()]) + "\n"
 today = datetime.now().strftime("%Y-%m-%d")
+
+
+@app.command()
+def where():
+    """Show the path to the default logfile"""
+    logfile = DEFAULT_PATH.resolve()
+    typer.echo(f"The logfile will default to {logfile}")
+    typer.echo("This can be set by the CPD_LOG_FILE environment variable")
 
 
 @app.command()

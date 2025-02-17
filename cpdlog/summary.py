@@ -1,9 +1,10 @@
 import logging
+from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
-from collections import defaultdict
-from .logfile import load_logfile
+
 from .activity import CPD_TYPE_MAX, MAX_NON_TECHNICAL
+from .logfile import load_logfile
 
 log = logging.getLogger(__name__)
 

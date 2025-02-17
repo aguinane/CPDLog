@@ -1,8 +1,8 @@
-from datetime import date
 import tempfile
+from datetime import date
 from pathlib import Path
-from cpdlog import Activity
-from cpdlog import save_logfile, load_logfile
+
+from cpdlog import Activity, load_logfile, save_logfile
 from cpdlog.logfile import check_create_logfile
 
 

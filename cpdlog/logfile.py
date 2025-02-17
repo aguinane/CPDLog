@@ -10,14 +10,14 @@ log = logging.getLogger(__name__)
 def load_logfile(file_path: Path, reverse: bool = True) -> list[Activity]:
     """Load list of CPD Activities from file"""
     activities = []
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         reader = csv.reader(f)
         firstline = next(reader)
         if firstline[0] != "CPDLog":
             raise ValueError(f"{file_path} is in the wrong format.")
         headings = [x.replace(" ", "_") for x in next(reader)]
         for row in reader:
-            items = dict(zip(headings, row))
+            items = dict(zip(headings, row, strict=False))
             act = Activity(**items)
             activities.append(act)
     activities.sort(key=lambda x: x.act_date, reverse=reverse)

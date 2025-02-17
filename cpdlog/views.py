@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import plotly
 import plotly.express as px
-from flask import Flask, redirect, render_template, url_for, request
+from flask import Flask, redirect, render_template, request, url_for
 
 from .activity import Activity
 from .logfile import load_logfile, save_logfile
@@ -30,7 +30,7 @@ def build_quarters_graph_json(quarter_totals: dict):
 
 def build_types_graph_json(cpd_type_totals: dict):
     df = pd.DataFrame(list(cpd_type_totals.items()), columns=["CPD Type", "Hours"])
-    fig = px.bar(df, y="CPD Type", x="Hours", orientation="h")
+    fig = px.bar(df, x="Hours", y="CPD Type", orientation="h")
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
 
