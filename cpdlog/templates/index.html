@@ -1,14 +1,21 @@
 {% extends "layout.html" %}
 {% block title %}CPD Log{% endblock %}
+
+{% block head %}
+    <!-- Import the Vega-Embed library -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+{% endblock %}
 {% block container %}
 
 <h1>CPDLog</h1>
 
 <p>There is a total of {{summary.total_hours}}h recorded over the last 3 years.
     {% if summary.total_hours > 150.0 %}
-    ({{(summary.total_hours - 150)}}h more then needed!)
+    ({{(summary.total_hours - 150)}}h more than the 150h needed!)
     {% else %}
-    <strong>({{(150 - summary.total_hours)}}h less then needed!)</strong>
+    <strong>({{(150 - summary.total_hours)}}h less than the 150h needed!)</strong>
     {% endif %}
     <br>Of that, {{expiring}}h will be expiring in the next year
     and {{150 - (summary.total_hours - expiring)}}h will need to be added.
@@ -23,9 +30,19 @@
 </p>
 {% endif %}
 
-<div id="quarters_totals_chart" style="max-width: 100%; height: 400px;"></div>
+ <div id="quarters-chart" style="max-width: 100%; height: 400px;"></div>
+    
+    <script>
+        var chartData = {{ quarters_graph|safe }};
+        vegaEmbed('#quarters-chart', chartData);
+    </script>
 
-<div id="types_totals_chart" style="max-width: 100%; height: 300px;"></div>
+ <div id="types-chart" style="max-width: 100%; height: 300px;"></div>
+
+    <script>
+        var chartData = {{ types_graph|safe }};
+        vegaEmbed('#types-chart', chartData);
+    </script>
 
 
 <h2>Activities</h2>
@@ -46,7 +63,6 @@
         <em>{{activity.act_date}}</em> {{activity.topic}}
         <em>[{{activity.cpd_hours}}hrs]</em>
     </summary>
-    <p>
     <dl>
         <dt>CPD Type:</dt>
         <dd>{{activity.cpd_type_code}}: {{activity.cpd_type_desc}}</dd>
@@ -64,8 +80,6 @@
         <dd>{{activity.notes}}</dd>
         {% endif %}
     </dl>
-
-    </p>
 </details>
 
 
@@ -75,17 +89,6 @@
 
 <p>Activities older then 3 years old are not shown.</p>
 
-
-
-<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
-<script type='text/javascript'>
-    var quartersgraph = {{ quarters_graph_json | safe}};
-    Plotly.plot('quarters_totals_chart', quartersgraph, {});
-</script>
-<script type='text/javascript'>
-    var typesgraph = {{ types_graph_json | safe}};
-    Plotly.plot('types_totals_chart', typesgraph, {});
-</script>
 
 {% endblock container%}
 

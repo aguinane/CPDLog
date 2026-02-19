@@ -2,7 +2,7 @@ from datetime import date
 from enum import Enum
 from uuid import uuid4
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 
 CPD_TYPES = {
     "A": "Tertiary Education",
@@ -56,9 +56,7 @@ class Activity(BaseModel):
     def expired(self, years: int = 3) -> bool:
         """Return whether activity is still valid"""
         diff = date.today() - self.act_date
-        if diff.days < 365.25 * years:
-            return False
-        return True
+        return not diff.days < 365.25 * years
 
     @property
     def cpd_type_code(self) -> str:
@@ -88,7 +86,8 @@ class Activity(BaseModel):
             return 3
         return 4
 
-    @validator("act_date")
+    @field_validator("act_date")
+    @classmethod
     def ensure_date_range(cls, v):
         if v > date.today():
             raise ValueError("Cannot be in future")

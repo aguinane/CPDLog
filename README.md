@@ -7,8 +7,10 @@ CPD Rules are based on the [BPEQ](https://bpeq.qld.gov.au/cpd/) and [Engineers A
 ## Install
 
 ```sh
-pip install git+https://github.com/aguinane/CPDLog.git
+pip install cpdlog
 ```
+
+Or alternatively, if you have uv installed you can run it directly by calling `uvx cpdlog`.
 
 ## Add an entry
 
@@ -58,7 +60,6 @@ A web GUI is also available to be generated based on the CSV file.
 ```python -m cpdlog gui --logfile example.csv```
 
 !["Summary Screenshot"](docs/web-summary.png "Summary Screenshot") !["New Screenshot"](docs/web-new.png "New Screenshot")
-
 
 
 ## Logfile location

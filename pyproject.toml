@@ -16,16 +16,16 @@ keywords = ["CPD"]
 requires-python = ">=3.10"
 dynamic = ["version", "description"]
 dependencies = [
-    "typer",
-    "cheroot",
-    "pydantic",
-    "plotly==5.24.1",
-    "pandas",
-    "flask",
+    "typer>=0.24.0",
+    "cheroot>=11.1.2",
+    "pydantic>=2.0",
+    "altair>=6.0.0",
+    "polars>=1.38.1",
+    "flask>=3.1.2",
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "ruff"]
+test = ["pytest", "pytest-cov"]
 
 [project.urls]
 Source = "https://github.com/aguinane/CPDLog/"

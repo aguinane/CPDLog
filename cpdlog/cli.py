@@ -11,7 +11,7 @@ from .logfile import check_create_logfile, load_logfile, save_logfile
 from .summary import get_cpd_summary
 from .views import app as webapp
 
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True)
 
 
 DEFAULT_PATH = Path(os.getenv("CPD_LOG_FILE", "cpdlog.csv"))
@@ -30,10 +30,10 @@ def where():
 @app.command()
 def new(
     logfile: Path = DEFAULT_PATH,
-    date: datetime = typer.Option(today, prompt=True),
+    date: datetime = typer.Option(today, prompt=True), # noqa: B008
     topic: str = typer.Option(..., prompt=True),
     hours: float = typer.Option(..., prompt=True),
-    cpd_type: CPDType = typer.Option("B", prompt=CPD_TYPE_PROMPT, case_sensitive=False),
+    cpd_type: CPDType = typer.Option("B", prompt=CPD_TYPE_PROMPT, case_sensitive=False),  # noqa: B008
     technical: bool = typer.Option(False, prompt=True),
     provider: str = typer.Option("", prompt=True),
     learning_outcome: str = typer.Option(..., prompt=True),

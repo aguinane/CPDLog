@@ -1,8 +1,6 @@
-import json
 
-import pandas as pd
-import plotly
-import plotly.express as px
+import altair as alt
+import polars as pl
 from flask import Flask, redirect, render_template, request, url_for
 
 from .activity import Activity
@@ -12,26 +10,37 @@ from .summary import get_cpd_summary
 app = Flask(__name__)
 
 
-def build_quarters_graph_json(quarter_totals: dict):
-    df = pd.DataFrame(list(quarter_totals.items()), columns=["Quarter", "Hours"])
-    fig = px.bar(df, x="Quarter", y="Hours")
-    fig.add_shape(
-        type="line",
-        xref="paper",
-        x0=0,
-        x1=1,
-        yref="y",
-        y0=12.5,
-        y1=12.5,
-        line=dict(color="Red", dash="dot"),
+def build_quarters_graph(quarter_totals: dict):
+    data = []
+    for quarter, hours in quarter_totals.items():
+        data.append({"Quarter": quarter, "Hours": hours})
+    df = pl.DataFrame(data)
+    bar = alt.Chart(df).mark_bar().encode(x=alt.X("Quarter:N"), y=alt.Y("Hours:Q"))
+    rule_df = pl.DataFrame({"Hours": [12.5]})
+    rule = (
+        alt.Chart(rule_df)
+        .mark_rule(color="red", strokeDash=[4, 4])
+        .encode(y=alt.Y("Hours:Q"))
     )
-    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    chart = (bar + rule).properties(width=600, height=300)
+    return chart.to_json()
 
 
-def build_types_graph_json(cpd_type_totals: dict):
-    df = pd.DataFrame(list(cpd_type_totals.items()), columns=["CPD Type", "Hours"])
-    fig = px.bar(df, x="Hours", y="CPD Type", orientation="h")
-    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+def build_types_graph(cpd_type_totals: dict):
+    data = []
+    for cpd_type, hours in cpd_type_totals.items():
+        data.append({"CPD Type": cpd_type, "Hours": hours})
+    df = pl.DataFrame(data)
+    chart = (
+        alt.Chart(df)
+        .mark_bar()
+        .encode(
+            x=alt.X("Hours:Q"),
+            y=alt.Y("CPD Type:N", sort=alt.SortField("Hours", order="descending")),
+        )
+        .properties(width=600, height=300)
+    )
+    return chart.to_json()
 
 
 @app.route("/")
@@ -41,16 +50,16 @@ def home():
     summary = get_cpd_summary(logfile, years=3)
     summary2 = get_cpd_summary(logfile, years=2)
     expiring = summary["total_hours"] - summary2["total_hours"]
-    quarters_graph_json = build_quarters_graph_json(summary["quarter_totals"])
-    types_graph_json = build_types_graph_json(summary["cpd_type_totals"])
+    quarters_graph = build_quarters_graph(summary["quarter_totals"])
+    types_graph = build_types_graph(summary["cpd_type_totals"])
     return render_template(
         "index.html",
         logfile=logfile,
         activities=activities,
         summary=summary,
         expiring=expiring,
-        quarters_graph_json=quarters_graph_json,
-        types_graph_json=types_graph_json,
+        quarters_graph=quarters_graph,
+        types_graph=types_graph,
     )
 
 
