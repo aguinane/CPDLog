@@ -1,5 +1,10 @@
 # CPD Log
 
+[![PyPI version](https://img.shields.io/pypi/pyversions/cpdlog)][pypi]
+[![PyPi downloads](https://img.shields.io/pypi/dw/cpdlog)][pypi]
+
+[pypi]: https://pypi.org/project/cpdlog/
+
 This program can be used to record and analyse Continued Professional Development (CPD) Activities. It will create CSV file that lets you add new activities.
 
 CPD Rules are based on the [BPEQ](https://bpeq.qld.gov.au/cpd/) and [Engineers Australia](https://www.engineersaustralia.org.au/sites/default/files/content-files/2016-12/cpd_types_and_conditions_march_2014.pdf) conditions. 

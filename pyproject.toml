@@ -10,22 +10,25 @@ license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
 ]
 keywords = ["CPD"]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dynamic = ["version", "description"]
 dependencies = [
     "typer>=0.24.0",
     "cheroot>=11.1.2",
-    "pydantic>=2.0",
+    "pydantic>=2.12.5",
     "altair>=6.0.0",
     "polars>=1.38.1",
     "flask>=3.1.2",
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov"]
+test = ["pytest>=9.0.2", "pytest-cov>=7.0.0"]
 
 [project.urls]
 Source = "https://github.com/aguinane/CPDLog/"

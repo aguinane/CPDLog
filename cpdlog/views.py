@@ -1,4 +1,3 @@
-
 import altair as alt
 import polars as pl
 from flask import Flask, redirect, render_template, request, url_for

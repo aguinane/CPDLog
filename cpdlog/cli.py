@@ -30,7 +30,7 @@ def where():
 @app.command()
 def new(
     logfile: Path = DEFAULT_PATH,
-    date: datetime = typer.Option(today, prompt=True), # noqa: B008
+    date: datetime = typer.Option(today, prompt=True),  # noqa: B008
     topic: str = typer.Option(..., prompt=True),
     hours: float = typer.Option(..., prompt=True),
     cpd_type: CPDType = typer.Option("B", prompt=CPD_TYPE_PROMPT, case_sensitive=False),  # noqa: B008
